@@ -151,17 +151,19 @@ class mainApp:
         self.mainmenu=Menu(root)
         self.menus=[]
         self.menuLabels=["File","Edit"] #MENU LABELS FOR THE MENU BAR
-        for i in range(len(self.menuLabels)): #FOR LOOP WHICH ASSIGNS THE LABEL TO THE MENU BAR
-            menux=Menu(self.mainmenu) #CREATES A PLACEHOLDER MENU OPTION
-            self.mainmenu.add_cascade(label=str(self.menuLabels[i]),menu=menux)
-            self.menus.append(menux) #ASSIGNING THE PLACEHOLDER AS AN OBJECT INTO A LIST FOR FUTURE REFERENCE.
-        self.fileOptions=["New","Login","retrieveMail"] #LIST OF ITEMS TO BE PUT IN THE File CASCADE
-        for i in range(len(self.fileOptions)):
-            self.menus[0].add_command(label=str(self.fileOptions[i]),command=eval(self.fileOptions[i]))
-        self.editOptions=["Preferences"] #LIST OF ITEMS TO BE PUT IN THE Edit CASCADE
-        for i in range(len(self.editOptions)):
-            self.menus[1].add_command(label=str(self.editOptions[i]),command=eval(self.editOptions[i]))
-        root.config(menu=self.mainmenu) #CONFIGURING THE GUI TO RECOGNISE THE MENU BAR.
+        self.subMenus=[['New','Login','retrieveMail'],
+                       ['Preferences']]
+        #The Creation Algorithm
+        for i in range(len(self.menuLabels)):
+            self.menux=Menu(self.mainmenu)
+            for j in range(len(self.subMenus)):
+                try:
+                    self.menux.add_command(label=str((self.subMenus[i])[j]),command=eval((self.subMenus[i])[j]))
+                except:
+                    IndexError
+            self.mainmenu.add_cascade(label=str(self.menuLabels[i]),menu=self.menux)
+            self.menus.append(self.menux)
+        root.config(menu=self.mainmenu)
 
         #FUNCTION TO CONFIGURE THE WINDOW SCROLLBAR
         def configScroll(event):
