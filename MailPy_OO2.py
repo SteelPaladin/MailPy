@@ -11,12 +11,12 @@ def Login():
     root_3=Tk()
     gui_3=logonWindow(root_3)
     root_3.mainloop()
-        
+
 def Preferences():
     root_4=Tk()
     gui_4=preferencesWindow(root_4)
     root_4.mainloop()
-    
+
 class errorWindow:
     def __init__(self, root):
         def destroy():
@@ -45,12 +45,12 @@ class logonWindow:
         checkvariable=False
         def enter():
             global user, passw
-            user=str(self.e1.get())
-            passw=str(self.e2.get())
+            user=str(self.entries[0].get())
+            passw=str(self.entries[1].get())
             if checkvariable == True:
                 usercredentials=open("UsrCrdn.txt","w")
-                usercredentials.write(str(self.e1.get()+"\n")) #STORING THE USERS EMAIL ADDRESS
-                usercredentials.write(str(self.e2.get()+"\n")) #STORING THE USERS PASSWORD
+                usercredentials.write(str(self.entries[0].get()+"\n")) #STORING THE USERS EMAIL ADDRESS
+                usercredentials.write(str(self.entries[1].get()+"\n")) #STORING THE USERS PASSWORD
                 usercredentials.close()
             try:    #ATTEMPTS TO LOGIN TO THE GMAIL SERVER WITH THE ENTERED CREDENTIALS
                 mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
@@ -74,13 +74,15 @@ class logonWindow:
         root.resizable(False,False)
         root.geometry('300x125')
         #ENTRY WIDGET TO ENTER USER'S EMAIL ADDRESS
-        self.l1=Label(root,text="Email Address:").pack(side=TOP,fill=X)
-        self.e1=Entry(root)
-        self.e1.pack(side=TOP,fill=X)
-        #ENTRY WIDGET TO ENTER USER'S PASSWORD
-        self.l2=Label(root,text="Password:").pack(side=TOP,fill=X)
-        self.e2=Entry(root)
-        self.e2.pack(side=TOP,fill=X)
+        self.label_text=["Email Address","Password"]
+        self.entries=[]
+        for i in range(len(self.label_text)):
+            self.l=Label(root,text=(self.label_text[i])).pack(side=TOP,fill=X)
+            if i == 1:
+                self.e=Entry(root,show='*',justify=CENTER).pack(side=TOP,fill=X)
+            else:
+                self.e=Entry(root,justify=CENTER).pack(side=TOP,fill=X)
+                self.entries.append(self.e)
         #CREATES A 'Remember Me' OPTION FOR THE PROGRAM TO MEMORISE THE USER'S CREDENTIALS
         self.c1=Checkbutton(root, text="Remember Me",command=checkCommand).pack(side=LEFT)
         self.b1=Button(root, text="ENTER",command=enter).pack(side=RIGHT)
@@ -141,7 +143,7 @@ class mainApp:
                 self.b=Button(self.nst_frame, text=str((num, self.msg["Subject"])))
                 self.mail_button_list.append(self.b)
                 self.b.pack(side=TOP,fill=X)
-                
+
         self.root=root
         root.title('MailPy')
         root.geometry('720x600')
@@ -168,11 +170,11 @@ class mainApp:
         #FUNCTION TO CONFIGURE THE WINDOW SCROLLBAR
         def configScroll(event):
             self.nst_canvas.configure(scrollregion=((self.nst_canvas).bbox(ALL)),width=335,height=540)
-                
+ 
         #CREATING THE FRAME FOR VIEWING EMAIL CONTENT.
         self.viewframe=Frame(root,height=590,width=335,relief=GROOVE,bd=1)
         self.viewframe.pack(side=RIGHT)
-        
+
         #CREATING THE FRAME TO LIST RECEIVED EMAILS
         self.mainframe=Frame(root,relief=GROOVE,width=350,height=710,bd=1)
         self.mainframe.pack(side=LEFT)
@@ -182,13 +184,13 @@ class mainApp:
         self.scrollbar=Scrollbar(self.mainframe,orient=VERTICAL,command=self.nst_canvas.yview)
         self.nst_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.pack(side=RIGHT,fill=Y)
-        
+
         self.nst_canvas.pack(side=LEFT)
         self.nst_canvas.create_window((0,0),height=-1,width=335,window=self.nst_frame,anchor=NW)
-        
+
         self.nst_frame.bind("<Configure>",configScroll)
         #CREATING 30 BUTTONS AS TEST EMAILS FOR DEBUGGING.
-        
+
         user=linecache.getline("UsrCrdn.txt", 1)
         passw=linecache.getline("UsrCrdn.txt",2)
         try:    #ATTEMPTS TO LOGIN TO THE GMAIL SERVER WITH THE ENTERED CREDENTIALS
