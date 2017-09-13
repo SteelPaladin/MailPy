@@ -95,17 +95,19 @@ class newMail:
             mail.ehlo()
             mail.starttls()
             mail.login(user, passw)
-            mail.sendmail(user,(self.recipient.get()),(self.textEntry).get())
+            mail.sendmail(user,(self.entries[0].get()),(self.textEntry).get())
             mail.close()
         self.root=root
         root.title("New Mail")
         root.iconbitmap('MailPy Logo.ico')
         root.geometry('500x500')
         root.resizable(False,False)
-        self.l1=Label(root, text="Recipient:").pack(side=TOP)
-        self.recipient=Entry(root).pack()
-        self.l2=Label(root, text="Subject:").pack(side=TOP)
-        self.subject=Entry(root).pack()
+        self.label_text=["Recipient:","Subject:"]
+        self.entries=[]
+        for i in range(len(self.label_text)):
+            self.l=Label(root,text=(self.label_text[i])).pack(side=TOP)
+            self.e=Entry(root,justify=CENTER).pack(side=TOP,fill=X)
+            self.entries.append(self.e)
         self.newmailmenu=Menu(root)
         self.newmailmenu.add_command(label="Send",command=Send)
         self.textEntry=Text(root,width=500,height=500)
