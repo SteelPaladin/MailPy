@@ -1,6 +1,7 @@
 '''Created on 25 Apr 2017 - Latest Update: ~~ 04/10/17 ~~
 @author: Harrison Baillie - SteelPaladin'''
 from tkinter import *
+from tkinter import messagebox
 import imaplib, smtplib, email, linecache
 from smtplib import SMTPAuthenticationError
 from email.mime.multipart import MIMEMultipart
@@ -31,8 +32,8 @@ class logonWindow:
                 mail.login(user,passw)
                 mail.select("INBOX")
             except:
-                SMTPAuthenticationErrord
-                tkMessageBox.showerror("Authentication","Unable to login")
+                SMTPAuthenticationError
+                messagebox.showerror("Authentication","Unable to login")
         def checkCommand():
             global checkvariable
             if checkvariable == False:
@@ -59,18 +60,21 @@ class logonWindow:
 class newMail:
     def __init__(self, root):
         def Send():
-            content=(self.textEntry.get(0.0,END))
-            mail=smtplib.SMTP('smtp.gmail.com',587)
-            mail.ehlo()
-            mail.starttls()
-            mail.login(user, passw)
-            msg=MIMEMultipart()
-            msg['From']=str(user)
-            msg['To']=str(self.entries[0].get())
-            msg['Subject']=str(self.entries[1].get())
-            msg.attach(MIMEText(message,'plain'))
-            mail.send_message(msg)
-            mail.close()
+            try:
+                content=(self.textEntry.get(0.0,END))
+                mail=smtplib.SMTP('smtp.gmail.com',587)
+                mail.ehlo()
+                mail.starttls()
+                mail.login(user, passw)
+                msg=MIMEMultipart()
+                msg['From']=str(user)
+                msg['To']=str(self.entries[0].get())
+                msg['Subject']=str(self.entries[1].get())
+                msg.attach(MIMEText(message,'plain'))
+                mail.close()
+            except:
+                TimeoutError
+                messagebox.showerror("Message Send","Unable to send message. Check your network.")
         self.root=root
         root.resizable(False,False)
         root.geometry('600x600')
@@ -105,12 +109,12 @@ class mainApp:
                 self.mail_button_list[i].destroy()
             rv, data = self.mail.search(None, "All")
             if rv != "OK":
-                tkMessageBox.showerror("Message Retrieval","Unable to retreive messages")
+                messagebox.showerror("Message Retrieval","Unable to retreive messages")
             i=int(0) #i must be used as a variable in the loop as num fails to work within the lambda command.
             for num in data[0].split():
                 rv, data= self.mail.fetch(num, "(RFC822)")
                 if rv != "OK":
-                    tkMessageBox.showerror("Message Retrieval","Error retrieving messages")
+                    messagebox.showerror("Message Retrieval","Error retrieving messages")
                 self.msg=email.message_from_bytes(data[0][1])
                 self.message_list.append(self.msg)                  #i=i tells i to be retrieved as it is when declared, not after the loop.
                 self.b=Button(self.nst_frame, text=((num, self.msg["Subject"])),command=lambda i=i:getPayload(self.message_list[i]))
@@ -169,7 +173,7 @@ class mainApp:
             self.mail.select("INBOX")
         except:     #CATCHES AN AUTHENTICATION ERROR TO STOP THE PROGRAM CRASHING.
             SMTPAuthenticationError #SPECIFIES THE AUTHENTICATION ERROR TO CATCH.
-            tkMessageBox.showerror("Authentication","Unable to login.\nCheck your Google security settings.")
+            messagebox.showerror("Authentication","Unable to login.\nCheck your Google security settings.")
         retrieveMail()
 
 root=Tk()
