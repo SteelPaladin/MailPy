@@ -1,43 +1,17 @@
-'''Created on 25 Apr 2017
+'''Created on 25 Apr 2017 - Latest Update: ~~ 04/10/17 ~~
 @author: Harrison Baillie - SteelPaladin'''
-from tkinter import * #IMPORTING THE TKINTER GUI MODULE
-import imaplib, smtplib, email, linecache #IMPORTING NETWORKING MODULES & MODULES TO READ SPECIFIC LINES
+from tkinter import *
+import imaplib, smtplib, email, linecache
 from smtplib import SMTPAuthenticationError
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 global prefwindowopen
 prefwindowopen=False
 
-#FUNCTION THAT LOGS INTO THE GMAIL SERVER
 def Login():
     root_3=Tk()
     gui_3=logonWindow(root_3)
     root_3.mainloop()
-
-def Preferences():
-    root_4=Tk()
-    gui_4=preferencesWindow(root_4)
-    root_4.mainloop()
-
-class errorWindow:
-    def __init__(self, root):
-        def destroy():
-            self.root.destroy()
-        self.root=root
-        root.title("ERROR")
-        root.iconbitmap('MailPy Logo.ico')
-        root.geometry('300x200')
-        root.resizable(False,False)
-        self.text=Text(root,width=300,height=200)
-        self.desButton=Button(root,text="OK",command=destroy)
-        self.desButton.pack(side=BOTTOM,fill=X)
-        self.text.pack()
-
-class preferencesWindow:
-    def __init__(self, root):
-        self.root=root
-        root.title("MailPy - Preferences")
-        root.iconbitmap('MailPy Logo.ico')
-        root.geometry('400x420')
-        root.resizable(False,False)
 
 class logonWindow:
     def __init__(self, root):
@@ -49,19 +23,16 @@ class logonWindow:
             passw=str(self.entries[1].get())
             if checkvariable == True:
                 usercredentials=open("UsrCrdn.txt","w")
-                usercredentials.write(str(self.entries[0].get()+"\n")) #STORING THE USERS EMAIL ADDRESS
-                usercredentials.write(str(self.entries[1].get()+"\n")) #STORING THE USERS PASSWORD
+                usercredentials.write(str(self.entries[0].get()+"\n"))
+                usercredentials.write(str(self.entries[1].get()+"\n"))
                 usercredentials.close()
-            try:    #ATTEMPTS TO LOGIN TO THE GMAIL SERVER WITH THE ENTERED CREDENTIALS
+            try:
                 mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
                 mail.login(user,passw)
                 mail.select("INBOX")
-            except:     #CATCHES AN AUTHENTICATION ERROR TO STOP THE PROGRAM CRASHING.
-                SMTPAuthenticationError #SPECIFIES THE AUTHENTICATION ERROR TO CATCH.
-                root_5=Tk() #CREATES AN ERROR MESSAGE
-                gui_5=errorWindow(root_5)
-                gui_5.text.insert(END, "Unable to login.")  #SPECIFIES THE ERROR MESSAGE TO MATCH THE ERROR.
-                root_5.mainloop()
+            except:
+                SMTPAuthenticationErrord
+                tkMessageBox.showerror("Authentication","Unable to login")
         def checkCommand():
             global checkvariable
             if checkvariable == False:
@@ -73,7 +44,6 @@ class logonWindow:
         root.iconbitmap('MailPy Logo.ico')
         root.resizable(False,False)
         root.geometry('300x125')
-        #ENTRY WIDGET TO ENTER USER'S EMAIL ADDRESS
         self.label_text=["Email Address","Password"]
         self.entries=[]
         for i in range(len(self.label_text)):
@@ -83,7 +53,6 @@ class logonWindow:
             else:
                 self.e=Entry(root,justify=CENTER).pack(side=TOP,fill=X)
                 self.entries.append(self.e)
-        #CREATES A 'Remember Me' OPTION FOR THE PROGRAM TO MEMORISE THE USER'S CREDENTIALS
         self.c1=Checkbutton(root, text="Remember Me",command=checkCommand).pack(side=LEFT)
         self.b1=Button(root, text="ENTER",command=enter).pack(side=RIGHT)
 
@@ -91,17 +60,21 @@ class newMail:
     def __init__(self, root):
         def Send():
             content=(self.textEntry.get(0.0,END))
-            mail=smtplib.SMTP('smtp.gmail.com',587, timeout=120)
+            mail=smtplib.SMTP('smtp.gmail.com',587)
             mail.ehlo()
             mail.starttls()
             mail.login(user, passw)
-            mail.sendmail(user,(self.entries[0].get()),(self.textEntry).get())
+            msg=MIMEMultipart()
+            msg['From']=str(user)
+            msg['To']=str(self.entries[0].get())
+            msg['Subject']=str(self.entries[1].get())
+            msg.attach(MIMEText(message,'plain'))
+            mail.send_message(msg)
             mail.close()
         self.root=root
-        root.title("New Mail")
-        root.iconbitmap('MailPy Logo.ico')
-        root.geometry('500x500')
         root.resizable(False,False)
+        root.geometry('600x600')
+        root.title('New Mail')
         self.label_text=["Recipient:","Subject:"]
         self.entries=[]
         for i in range(len(self.label_text)):
@@ -119,45 +92,42 @@ def New():
     gui_2=newMail(root_2)
     root_2.mainloop()
 
-#CREATING A CLASS FOR THE MAIN APP WINDOW
 class mainApp:
     def __init__(self, root):
         self.mail_button_list=[]
+        self.message_list=[]
+        def getPayload(x):
+            self.textDisplay.delete(1.0,END)
+            self.textDisplay.insert(END, x.get_payload(None))
         #FUNCTION TO RETRIEVE ALL MAIL FROM USER'S INBOX
         def retrieveMail():
-            #LOOP WHICH DESTROYS ALL CURRENTLY DISPLAYED EMAILS WITHIN THE FRAME
             for i in range(len(self.mail_button_list)):
                 self.mail_button_list[i].destroy()
             rv, data = self.mail.search(None, "All")
             if rv != "OK":
-                root_5=Tk()
-                gui_5=errorWindow(root_5)
-                gui_5.text.insert(END, "Unable to retrieve messages.")
-                root_5.mainloop()
+                tkMessageBox.showerror("Message Retrieval","Unable to retreive messages")
+            i=int(0) #i must be used as a variable in the loop as num fails to work within the lambda command.
             for num in data[0].split():
                 rv, data= self.mail.fetch(num, "(RFC822)")
                 if rv != "OK":
-                    root_5=Tk()
-                    gui_5=errorWindow(root_5)
-                    gui_5.text.insert(END, "Error retrieving messages.")
-                    root_5.mainloop()
+                    tkMessageBox.showerror("Message Retrieval","Error retrieving messages")
                 self.msg=email.message_from_bytes(data[0][1])
-                self.b=Button(self.nst_frame, text=str((num, self.msg["Subject"])))
+                self.message_list.append(self.msg)                  #i=i tells i to be retrieved as it is when declared, not after the loop.
+                self.b=Button(self.nst_frame, text=((num, self.msg["Subject"])),command=lambda i=i:getPayload(self.message_list[i]))
                 self.mail_button_list.append(self.b)
-                self.b.pack(side=TOP,fill=X)
+                i+=1 #Incrementing i every time the loop develops
+            for i in range(len(self.mail_button_list)):
+                self.mail_button_list[i].pack(side=TOP,fill=X)
 
         self.root=root
         root.title('MailPy')
         root.geometry('720x600')
         root.resizable(False,False)
         root.iconbitmap('MailPy Logo.ico')
-        #CREATING A MENU BAR
         self.mainmenu=Menu(root)
         self.menus=[]
         self.menuLabels=["File","Edit"] #MENU LABELS FOR THE MENU BAR
-        self.subMenus=[['New','Login','retrieveMail'],
-                       ['Preferences']]
-        #The Creation Algorithm
+        self.subMenus=[['New','Login','retrieveMail']]
         for i in range(len(self.menuLabels)):
             self.menux=Menu(self.mainmenu)
             for j in range(len(self.subMenus)):
@@ -169,29 +139,27 @@ class mainApp:
             self.menus.append(self.menux)
         root.config(menu=self.mainmenu)
 
-        #FUNCTION TO CONFIGURE THE WINDOW SCROLLBAR
         def configScroll(event):
             self.nst_canvas.configure(scrollregion=((self.nst_canvas).bbox(ALL)),width=335,height=540)
- 
-        #CREATING THE FRAME FOR VIEWING EMAIL CONTENT.
-        self.viewframe=Frame(root,height=590,width=335,relief=GROOVE,bd=1)
-        self.viewframe.pack(side=RIGHT)
 
-        #CREATING THE FRAME TO LIST RECEIVED EMAILS
-        self.mainframe=Frame(root,relief=GROOVE,width=350,height=710,bd=1)
+        #CREATING THE FRAME FOR VIEWING EMAIL CONTENT.
+        self.viewframe=Frame(root,height=590,width=350,relief=GROOVE,bd=1)
+        self.viewframe.pack(side=RIGHT)
+        self.viewframe.pack_propagate(0) #Tells the frame not to let its children control its size.
+        self.textDisplay=Text(self.viewframe,height=590)
+        self.textDisplay.pack()
+
+        self.mainframe=Frame(root,relief=GROOVE,width=265,height=600,bd=1)
         self.mainframe.pack(side=LEFT)
         self.nst_canvas=Canvas(self.mainframe,relief=GROOVE,bd=1,width=335)
         self.nst_frame=Frame(self.nst_canvas,width=335)
-        #CREATING A SCROLLBAR
         self.scrollbar=Scrollbar(self.mainframe,orient=VERTICAL,command=self.nst_canvas.yview)
         self.nst_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.pack(side=RIGHT,fill=Y)
-
         self.nst_canvas.pack(side=LEFT)
         self.nst_canvas.create_window((0,0),height=-1,width=335,window=self.nst_frame,anchor=NW)
 
         self.nst_frame.bind("<Configure>",configScroll)
-        #CREATING 30 BUTTONS AS TEST EMAILS FOR DEBUGGING.
 
         user=linecache.getline("UsrCrdn.txt", 1)
         passw=linecache.getline("UsrCrdn.txt",2)
@@ -201,10 +169,7 @@ class mainApp:
             self.mail.select("INBOX")
         except:     #CATCHES AN AUTHENTICATION ERROR TO STOP THE PROGRAM CRASHING.
             SMTPAuthenticationError #SPECIFIES THE AUTHENTICATION ERROR TO CATCH.
-            root_5=Tk() #CREATES AN ERROR MESSAGE WINDOW
-            gui_5=errorWindow(root_5)
-            gui_5.text.insert(END, "Unable to login.\nCheck your Google security settings.")  #SPECIFIES THE ERROR MESSAGE TO MATCH THE ERROR.
-            root_5.mainloop()
+            tkMessageBox.showerror("Authentication","Unable to login.\nCheck your Google security settings.")
         retrieveMail()
 
 root=Tk()
