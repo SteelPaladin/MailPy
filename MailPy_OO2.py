@@ -9,6 +9,9 @@ from email.mime.text import MIMEText
 global prefwindowopen
 prefwindowopen=False
 
+def Preferences():
+    print("Preferences")
+
 def Login():
     root_3=Tk()
     gui_3=logonWindow(root_3)
@@ -131,16 +134,20 @@ class mainApp:
         self.mainmenu=Menu(root)
         self.menus=[]
         self.menuLabels=["File","Edit"] #MENU LABELS FOR THE MENU BAR
-        self.subMenus=[['New','Login','retrieveMail']]
+        self.subMenus=[['New','Login','retrieveMail'],
+                       ['Preferences']]
         for i in range(len(self.menuLabels)):
-            self.menux=Menu(self.mainmenu)
-            for j in range(len(self.subMenus)):
-                try:
-                    self.menux.add_command(label=str((self.subMenus[i])[j]),command=eval((self.subMenus[i])[j]))
-                except:
-                    IndexError
-            self.mainmenu.add_cascade(label=str(self.menuLabels[i]),menu=self.menux)
-            self.menus.append(self.menux)
+            try:
+                self.menux=Menu(self.mainmenu)
+                for j in range(len(self.subMenus[i])):
+                    try:
+                            self.menux.add_command(label=str((self.subMenus[i])[j]),command=eval((self.subMenus[i])[j]))
+                    except:
+                        IndexError
+                self.mainmenu.add_cascade(label=str(self.menuLabels[i]),menu=self.menux)
+                self.menus.append(self.menux)
+            except:
+                IndexError
         root.config(menu=self.mainmenu)
 
         def configScroll(event):
