@@ -23,20 +23,25 @@ class logonWindow:
         checkvariable=False
         def enter():
             global user, passw
-            user=str(self.entries[0].get())
-            passw=str(self.entries[1].get())
+            user=(self.entries[0].get())
+            passw=(self.entries[1].get())
             if checkvariable == True:
-                usercredentials=open("UsrCrdn.txt","w")
+                usercredentials=open('UsrCrdn.txt','w')
                 usercredentials.write(str(self.entries[0].get()+"\n"))
                 usercredentials.write(str(self.entries[1].get()+"\n"))
                 usercredentials.close()
+            self.vet=True
             try:
-                mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+                mail = imaplib.IMAP4_SSL('imap.gmail.com', 993)
                 mail.login(user,passw)
                 mail.select("INBOX")
             except:
                 SMTPAuthenticationError
-                messagebox.showerror("Authentication","Unable to login")
+                messagebox.showerror("Authentication","Unable to login.")
+                self.vet=False
+            if self.vet==True:
+                messagebox.showinfo('Login','User successfully logged in')
+                self.root.destroy() #Destroying the login window
         def checkCommand():
             global checkvariable
             if checkvariable == False:
@@ -49,13 +54,17 @@ class logonWindow:
         root.resizable(False,False)
         root.geometry('300x125')
         self.label_text=["Email Address","Password"]
+        self.user_ent=Entry(root)
         self.entries=[]
         for i in range(len(self.label_text)):
             self.l=Label(root,text=(self.label_text[i])).pack(side=TOP,fill=X)
             if i == 1:
-                self.e=Entry(root,show='*',justify=CENTER).pack(side=TOP,fill=X)
+                self.e=Entry(root,show='*',justify=CENTER)
+                self.e.pack(side=TOP,fill=X)
+                self.entries.append(self.e)
             else:
-                self.e=Entry(root,justify=CENTER).pack(side=TOP,fill=X)
+                self.e=Entry(root,justify=CENTER)
+                self.e.pack(side=TOP,fill=X)
                 self.entries.append(self.e)
         self.c1=Checkbutton(root, text="Remember Me",command=checkCommand).pack(side=LEFT)
         self.b1=Button(root, text="ENTER",command=enter).pack(side=RIGHT)
@@ -106,25 +115,28 @@ class mainApp:
         def getPayload(x):
             self.textDisplay.delete(1.0,END)
             self.textDisplay.insert(END, x.get_payload(None))
-        #FUNCTION TO RETRIEVE ALL MAIL FROM USER'S INBOX
         def retrieveMail():
             for i in range(len(self.mail_button_list)):
                 self.mail_button_list[i].destroy()
-            rv, data = self.mail.search(None, "All")
-            if rv != "OK":
-                messagebox.showerror("Message Retrieval","Unable to retreive messages")
-            i=int(0) #i must be used as a variable in the loop as num fails to work within the lambda command.
-            for num in data[0].split():
-                rv, data= self.mail.fetch(num, "(RFC822)")
+            try:
+                rv, data = self.mail.search(None, "All")
                 if rv != "OK":
-                    messagebox.showerror("Message Retrieval","Error retrieving messages")
-                self.msg=email.message_from_bytes(data[0][1])
-                self.message_list.append(self.msg)                  #i=i tells i to be retrieved as it is when declared, not after the loop.
-                self.b=Button(self.nst_frame, text=((num, self.msg["Subject"])),command=lambda i=i:getPayload(self.message_list[i]))
-                self.mail_button_list.append(self.b)
-                i+=1 #Incrementing i every time the loop develops
-            for i in range(len(self.mail_button_list)):
-                self.mail_button_list[i].pack(side=TOP,fill=X)
+                    messagebox.showerror("Message Retrieval","Unable to retreive messages")
+                i=int(0) #i must be used as a variable in the loop as num fails to work within the lambda command.
+                for num in data[0].split():
+                    rv, data= self.mail.fetch(num, "(RFC822)")
+                    if rv != "OK":
+                        messagebox.showerror("Message Retrieval","Error retrieving messages")
+                    self.msg=email.message_from_bytes(data[0][1])
+                    self.message_list.append(self.msg)          #i=i tells i to be retrieved as it is when declared, not after the loop.
+                    self.b=Button(self.nst_frame, text=((num, self.msg["Subject"])),command=lambda i=i:getPayload(self.message_list[i]))
+                    self.mail_button_list.append(self.b)
+                    i+=1 #Incrementing i every time the loop develops
+                for i in range(len(self.mail_button_list)):
+                    self.mail_button_list[i].pack(side=TOP,fill=X)
+            except:
+                UnboundLocalError,imaplib.IMAP4.error
+                messagebox.showerror("Message Retrieval","Unable to retrive messages.")
 
         self.root=root
         root.title('MailPy')
@@ -133,7 +145,7 @@ class mainApp:
         root.iconbitmap('MailPy Logo.ico')
         self.mainmenu=Menu(root)
         self.menus=[]
-        self.menuLabels=["File","Edit"] #MENU LABELS FOR THE MENU BAR
+        self.menuLabels=["File","Edit"] #Menu labels for mainmemnu bar
         self.subMenus=[['New','Login','retrieveMail'],
                        ['Preferences']]
         for i in range(len(self.menuLabels)):
@@ -169,19 +181,22 @@ class mainApp:
         self.scrollbar.pack(side=RIGHT,fill=Y)
         self.nst_canvas.pack(side=LEFT)
         self.nst_canvas.create_window((0,0),height=-1,width=335,window=self.nst_frame,anchor=NW)
-
-        self.nst_frame.bind("<Configure>",configScroll)
+        self.nst_frame.bind("<Configure>",configScroll) #Binding the nested frame to scrollbar.
 
         user=linecache.getline("UsrCrdn.txt", 1)
         passw=linecache.getline("UsrCrdn.txt",2)
-        try:    #ATTEMPTS TO LOGIN TO THE GMAIL SERVER WITH THE ENTERED CREDENTIALS
+        vet=True
+        try:    #Attempting auto-login
             self.mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
             self.mail.login(user,passw)
             self.mail.select("INBOX")
-        except:     #CATCHES AN AUTHENTICATION ERROR TO STOP THE PROGRAM CRASHING.
+        except:     #Catching authentication error
             SMTPAuthenticationError #SPECIFIES THE AUTHENTICATION ERROR TO CATCH.
             messagebox.showerror("Authentication","Unable to login.\nCheck your Google security settings.")
-        retrieveMail()
+            vet=False
+        if vet==True:
+            messagebox.showinfo('Login','User successfully logged in')
+            retrieveMail()
 
 root=Tk()
 gui=mainApp(root)
