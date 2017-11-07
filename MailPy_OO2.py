@@ -6,11 +6,12 @@ import imaplib, smtplib, email, linecache
 from smtplib import SMTPAuthenticationError
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-global prefwindowopen
-prefwindowopen=False
 
-def Preferences():
-    print("Preferences")
+def changeServer(domain):
+    global domain_name #Globalising the domain name variable
+    domain_name=domain
+    f=open('UsrCrdn.txt','w').close() #Wiping current user data
+    messagebox.showinfo("Server Change", ("You have altered your server domain to,",domain_name,".\nPlease log in again."))
 
 def Login():
     root_3=Tk()
@@ -32,7 +33,7 @@ class logonWindow:
                 usercredentials.close()
             self.vet=True
             try:
-                mail = imaplib.IMAP4_SSL('imap.gmail.com', 993)
+                mail = imaplib.IMAP4_SSL(domain_name, '993')
                 mail.login(user,passw)
                 mail.select("INBOX")
             except:
@@ -74,7 +75,7 @@ class newMail:
         def Send():
             try:
                 content=(self.textEntry.get(0.0,END))
-                mail=smtplib.SMTP('smtp.gmail.com',587)
+                mail=smtplib.SMTP(domain_name,'587')
                 mail.ehlo()
                 mail.starttls()
                 mail.login(user, passw)
@@ -145,9 +146,10 @@ class mainApp:
         root.iconbitmap('MailPy Logo.ico')
         self.mainmenu=Menu(root)
         self.menus=[]
-        self.menuLabels=["File","Edit"] #Menu labels for mainmemnu bar
-        self.subMenus=[['New','Login','retrieveMail'],
-                       ['Preferences']]
+        self.menuLabels=["File","Edit","Mail"] #Menu labels for mainmemnu bar
+        self.subMenus=[['New','Login'],
+                       ['MailServer'],
+                       ['retrieveMail']]
         for i in range(len(self.menuLabels)):
             try:
                 self.menux=Menu(self.mainmenu)
@@ -161,6 +163,10 @@ class mainApp:
             except:
                 IndexError
         root.config(menu=self.mainmenu)
+        self.servermenu=Menu(self.mainmenu)
+        self.servermenu.add_command(label='Gmail',command=lambda:changeServer('smtp.gmail.com'))
+        self.servermenu.add_command(label='Hotmail',command=lambda:changeServer('smtp.live.com')) #Lambdas are used here to allowfor parameter parsing
+        self.menus[2].add_cascade(label='Mail Servers',menu=self.servermenu) #Adding a secondary cascade to the MailServers option
 
         def configScroll(event):
             self.nst_canvas.configure(scrollregion=((self.nst_canvas).bbox(ALL)),width=335,height=540)
@@ -187,7 +193,7 @@ class mainApp:
         passw=linecache.getline("UsrCrdn.txt",2)
         vet=True
         try:    #Attempting auto-login
-            self.mail = imaplib.IMAP4_SSL("imap.gmail.com", 993)
+            self.mail = imaplib.IMAP4_SSL(domain_name, '993')
             self.mail.login(user,passw)
             self.mail.select("INBOX")
         except:     #Catching authentication error
