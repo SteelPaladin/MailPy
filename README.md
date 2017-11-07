@@ -18,3 +18,7 @@ Version 1.2. released on 13-10-17 fixed issues with shell errors still appearing
 This was fixed by placing an exception statement around the block of issue, catching the IMAP4 error and its 
 consequential UnboundLocalError's from both rv and data variables. The program now runs smoother, and with 
 increased fluidity.
+
+Version 1.2.5. released on 07-11-17 added untested support for Hotmail domains, allowing users to switch between
+accounts, logging a user out of one (thus removing their credentials from the UsrCrdn.txt storage file) and allowing
+them to login on the new domain. Once tested to be working, this will mark version 1.3.
