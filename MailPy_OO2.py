@@ -1,4 +1,4 @@
-'''Created on 25 Apr 2017 - Latest Update: ~~ 07/11/17 ~~
+'''Created on 25 Apr 2017 - Latest Update: ~~ 01/12/17 ~~
 @author: Harrison Baillie - SteelPaladin'''
 from tkinter import *
 from tkinter import messagebox
@@ -38,7 +38,7 @@ class logonWindow:
                 mail.select("INBOX")
             except:
                 SMTPAuthenticationError
-                messagebox.showerror("Authentication","Unable to login.")
+                messagebox.showerror("Authentication","Vet Failed.\nUnable to Login.")
                 self.vet=False
             if self.vet==True:
                 messagebox.showinfo('Login','User successfully logged in')
