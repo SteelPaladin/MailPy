@@ -22,3 +22,5 @@ increased fluidity.
 Version 1.2.5. released on 07-11-17 added untested support for Hotmail domains, allowing users to switch between
 accounts, logging a user out of one (thus removing their credentials from the UsrCrdn.txt storage file) and allowing
 them to login on the new domain. Once tested to be working, this will mark version 1.3.
+
+Version 1.2.6 released on 01-12-17 added a specified error message for the vet send to the mail server.
