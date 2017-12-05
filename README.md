@@ -24,3 +24,5 @@ accounts, logging a user out of one (thus removing their credentials from the Us
 them to login on the new domain. Once tested to be working, this will mark version 1.3.
 
 Version 1.2.6 released on 01-12-17 added a specified error message for the vet send to the mail server.
+
+Version 1.2.8. released on 05-12-17 added Hex encryption to the user's stored data for increased security.
