@@ -7,6 +7,28 @@ from smtplib import SMTPAuthenticationError
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+def hexEncrypt(passw):
+    hextable = ['41','42','43','44','45','46','47','48','49','4A','4B','4C','4D',
+                '4E','4F','50','51','52','53','54','55','56','57','58','59','5A',
+                '61','62','63','64','65','67','68','69','6A','6B','6C','6D','6E',
+                '6F','71','72','73','74','75','76','77','78','79','7A']
+    alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+                'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+                'a','b','c','d','e','f','g','h','i','j','k','l','m',
+                'n','o','p','q','r','s','t','u','v','w','x','y','z']
+    try:
+        newpass=['0x']
+        for i in range(len(passw)):
+            curval=passw[i]
+            for j in range(len(hextable)):
+                if curval == alphabet[j]:
+                    newpass.append(hextable[j])
+                    print(hextable[j])
+    except:
+        IndexError
+    print(newpass)
+    return (''.join(newpass))
+
 def changeServer(domain):
     global domain_name #Globalising the domain name variable
     domain_name=domain
@@ -28,8 +50,9 @@ class logonWindow:
             passw=(self.entries[1].get())
             if checkvariable == True:
                 usercredentials=open('UsrCrdn.txt','w')
-                usercredentials.write(str(self.entries[0].get()+"\n"))
-                usercredentials.write(str(self.entries[1].get()+"\n"))
+                usercredentials.write(hexEncrypt(str(self.entries[0].get())))
+                usercredentials.write("\n")
+                usercredentials.write(hexEncrypt(str(self.entries[1].get())))
                 usercredentials.close()
             self.vet=True
             try:
