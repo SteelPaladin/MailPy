@@ -26,3 +26,5 @@ them to login on the new domain. Once tested to be working, this will mark versi
 Version 1.2.6 released on 01-12-17 added a specified error message for the vet send to the mail server.
 
 Version 1.2.8. released on 05-12-17 added Hex encryption to the user's stored data for increased security.
+
+Version 1.2.9. released on 14-12-17 added in Hex decryption. @ character unrecognised in this process.
