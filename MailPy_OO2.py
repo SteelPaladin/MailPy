@@ -7,15 +7,18 @@ from smtplib import SMTPAuthenticationError
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+hextable = ['41','42','43','44','45','46','47','48','49','4A','4B','4C','4D',
+            '4E','4F','50','51','52','53','54','55','56','57','58','59','5A',
+            '61','62','63','64','65','67','68','69','6A','6B','6C','6D','6E',
+            '6F','71','72','73','74','75','76','77','78','79','7A','40']
+alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+            'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+            'a','b','c','d','e','f','g','h','i','j','k','l','m',
+            'n','o','p','q','r','s','t','u','v','w','x','y','z','@']
+
+#Encryption/Decryption working, for some reason the @/40 character is not being recognised in either one, or both of these processes.
+
 def hexEncrypt(passw):
-    hextable = ['41','42','43','44','45','46','47','48','49','4A','4B','4C','4D',
-                '4E','4F','50','51','52','53','54','55','56','57','58','59','5A',
-                '61','62','63','64','65','67','68','69','6A','6B','6C','6D','6E',
-                '6F','71','72','73','74','75','76','77','78','79','7A']
-    alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
-                'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-                'a','b','c','d','e','f','g','h','i','j','k','l','m',
-                'n','o','p','q','r','s','t','u','v','w','x','y','z']
     try:
         newpass=['0x']
         for i in range(len(passw)):
@@ -23,11 +26,27 @@ def hexEncrypt(passw):
             for j in range(len(hextable)):
                 if curval == alphabet[j]:
                     newpass.append(hextable[j])
-                    print(hextable[j])
     except:
         IndexError
-    print(newpass)
     return (''.join(newpass))
+
+def hexDecrypt(passw):
+    try:
+        newpass=[]
+        for i in range(len(passw)):
+            #I don't even know what the fuck happened here.
+            if i == 0:
+                curval=str((passw[i])+(passw[i+1]))
+            else:
+                curval=str((passw[i*2])+(passw[(i*2)+1]))
+            print("RUNNING",curval)
+            for j in range(len(hextable)):
+                if curval == hextable[j]:
+                    newpass.append(alphabet[j])
+    except:
+        IndexError
+    return (''.join(newpass))
+
 
 def changeServer(domain):
     global domain_name #Globalising the domain name variable
@@ -211,9 +230,11 @@ class mainApp:
         self.nst_canvas.pack(side=LEFT)
         self.nst_canvas.create_window((0,0),height=-1,width=335,window=self.nst_frame,anchor=NW)
         self.nst_frame.bind("<Configure>",configScroll) #Binding the nested frame to scrollbar.
-
-        user=linecache.getline("UsrCrdn.txt", 1)
-        passw=linecache.getline("UsrCrdn.txt",2)
+        #~~~~~~~~~~~~~~~~~~~~Hexadecimal Cipher~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        user=hexDecrypt(linecache.getline("UsrCrdn.txt", 1))
+        passw=hexDecrypt(linecache.getline("UsrCrdn.txt",2))
+        print(user,passw)
+        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         vet=True
         try:    #Attempting auto-login
             self.mail = imaplib.IMAP4_SSL(domain_name, '993')
