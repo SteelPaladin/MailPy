@@ -9,8 +9,8 @@ from email.mime.text import MIMEText
 
 hextable = ['41','42','43','44','45','46','47','48','49','4A','4B','4C','4D',
             '4E','4F','50','51','52','53','54','55','56','57','58','59','5A',
-            '61','62','63','64','65','67','68','69','6A','6B','6C','6D','6E',
-            '6F','71','72','73','74','75','76','77','78','79','7A','40']
+            '61','62','63','64','65','66','67','68','69','6A','6B','6C','6D','6E',
+            '6F','70','71','72','73','74','75','76','77','78','79','7A','40']
 alphabet = ['A','B','C','D','E','F','G','H','I','J','K','L','M',
             'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
             'a','b','c','d','e','f','g','h','i','j','k','l','m',
@@ -23,9 +23,11 @@ def hexEncrypt(passw):
         newpass=['0x']
         for i in range(len(passw)):
             curval=passw[i]
-            for j in range(len(hextable)):
+            print("RUNNING",curval)
+            for j in range(len(alphabet)):
                 if curval == alphabet[j]:
                     newpass.append(hextable[j])
+                    print(hextable[j])
     except:
         IndexError
     return (''.join(newpass))
@@ -39,10 +41,10 @@ def hexDecrypt(passw):
                 curval=str((passw[i])+(passw[i+1]))
             else:
                 curval=str((passw[i*2])+(passw[(i*2)+1]))
-            print("RUNNING",curval)
             for j in range(len(hextable)):
                 if curval == hextable[j]:
                     newpass.append(alphabet[j])
+                    print(alphabet[j])
     except:
         IndexError
     return (''.join(newpass))
