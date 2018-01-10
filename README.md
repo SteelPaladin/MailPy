@@ -28,3 +28,5 @@ Version 1.2.6 released on 01-12-17 added a specified error message for the vet s
 Version 1.2.8. released on 05-12-17 added Hex encryption to the user's stored data for increased security.
 
 Version 1.2.9. released on 14-12-17 added in Hex decryption. @ character unrecognised in this process.
+
+Version 1.2.3 released on10-01-18 completed Hex Decryption.
