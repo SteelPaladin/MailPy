@@ -30,3 +30,5 @@ Version 1.2.8. released on 05-12-17 added Hex encryption to the user's stored da
 Version 1.2.9. released on 14-12-17 added in Hex decryption. @ character unrecognised in this process.
 
 Version 1.2.3 released on10-01-18 completed Hex Decryption.
+
+Version 2.0.0 released on 12-03-18, large back-end redesign. All core/necessary modules work.
