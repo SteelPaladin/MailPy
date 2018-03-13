@@ -32,3 +32,6 @@ Version 1.2.9. released on 14-12-17 added in Hex decryption. @ character unrecog
 Version 1.2.3 released on10-01-18 completed Hex Decryption.
 
 Version 2.0.0 released on 12-03-18, large back-end redesign. All core/necessary modules work.
+
+Version 2.2.0 released on 13-03-18, large touch-up of functionality. Mail object is now global, one login works for all functions.
+                                     completed encryption/decryption errors.
